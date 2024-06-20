@@ -1,0 +1,9 @@
+setup.py
+learn_celery/__init__.py
+learn_celery/celery_app.py
+learn_celery/celeryconfig.py
+learn_celery/tasks.py
+learn_celery.egg-info/PKG-INFO
+learn_celery.egg-info/SOURCES.txt
+learn_celery.egg-info/dependency_links.txt
+learn_celery.egg-info/top_level.txt
