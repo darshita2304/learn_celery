@@ -1,7 +1,7 @@
 from celery import Celery
 from celery_module.celeryappconfig import CeleryAppConfig
 
-app = Celery('celery_with_flask',
+app = Celery('celery_module',
              broker=CeleryAppConfig.broker_url,
              backend=CeleryAppConfig.result_backend)
 
@@ -12,7 +12,7 @@ app.conf.update(
 )
 
 # Ensure Celery autodiscovers tasks
-app.autodiscover_tasks(['celery_with_flask'])
+app.autodiscover_tasks(['celery_module'])
 
 
 @app.task(bind=True)
@@ -21,4 +21,16 @@ def debug_task(self):
 
 
 if __name__ == '__main__':
+    # app.conf.CELERY_TIMEZONE = 'UTC'
+    # Inspect the current worker
     app.start()
+
+    worker = app.control.inspect()
+
+    # Get all scheduled tasks
+    scheduled_tasks = worker.scheduled()
+
+    # Print the scheduled tasks
+    for task in scheduled_tasks:
+        print("from celery_app.py...")
+        print(task)

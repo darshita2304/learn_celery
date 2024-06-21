@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invitation App</title>
+  <!-- google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Mulish&display=swap" rel="stylesheet">
+  <!-- custom css -->
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+  <div id="wrapper">
+    <div class="invitation">
+      <header id="header">
+        <h1>New Taske</h1>
+      </header>
+      <main class="main">	
+        <form id="inviteForm" action="/addtask" method="POST">
+          <label for="lbltime">Task Name:</label>
+          <input type="text" name="task_name" id="task_name" placeholder="Task Name">
+          <br/>
+          <label for="lbltime">Task (date and time):</label>
+          <input type="datetime-local" id="task_datetime" name="task_datetime">
+          <br/>
+          <label for="lbltime">Selection Task Function:</label>
+          <select id="tasks_fn" name="tasks_fn">
+            <option value="task1">Task 1:</option>
+            <option value="task2">Task 2</option>
+            <option value="task3">Task 3</option>
+            <option value="task4">Task 4</option>
+          </select>
+          <br/>
+          <button type="submit" name="submit" value="submit">Add</button>
+        </form>
+        <!-- 
+        <div class="showHide">
+          <label>Hide those who haven't responded</label>
+          <input type="checkbox">
+        </div> 
+        -->
+        <table cellspacing="0" border="1">
+      <tr>
+         <th>Task ID</th>
+         <th>Task Name</th>
+         <th>Date Time</th>         
+         <th>Task_fn</th>         
+         <th>result</th>
+         <th>isPause</th>
+      </tr>
+      
+        {% if task_list is defined %}
+        
+        {% for id, task in task_list.items() %}
+        <tr>
+            <td><strong>{{ id }}</strong></td>
+             <td>{{task['task_name']}}</td>
+             <td>{{task['task_datetime']}}</td>
+             <td>{{task['task_fn']}}</td>
+             
+             <td>{{task['result']}}</td>
+
+             <td>
+             {% if (task['is_pause']) %}
+                <form id="pauseForm" action="/resume_task" method="POST">
+                  <input type="hidden" id="task_id" name="task_id" value={{id}}>
+                  <button type="submit" name="submit" value="submit">Resume</button> </form>
+            {% else %}
+                <form id="pauseForm" action="/pause_task" method="POST">
+                  <input type="hidden" id="task_id" name="task_id" value={{id}}>
+                    <button type="submit" name="submit" value="submit">Pause</button>
+                </form>
+            {% endif %}           
+        </td>
+        </tr>
+        {% endfor %}
+          
+    {% endif %}          
+   </table>
+      </main>
+    </div>
+  </div>
+  <!-- custom js -->
+  <script type="text/javascript" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<html>
+<h1>
+
+    <table cellspacing="0" border="1">
+      <tr>
+         <th>Task Name</th>
+         <th>Task Time</th>
+         <th>Action</th>
+         <th>Delete</th>
+      </tr>
+         {% for result in results %}
+      <tr>
+         <td>{{result['task_name']}}</td>
+         <td>{{result['task_datetime']}}</td>
+         <td>{{result['task_fn']}}</td>
+         <td>{{result['task_status']}}</td>
+         <td>
+             {% if (result['is_pause']) %}
+                <form id="pauseForm" action="/resume" method="POST">
+                <button type="submit" name="submit" value="submit">Resume</button> </form>
+            {% else %}
+                <form id="pauseForm" action="/pause" method="POST">
+                    <button type="submit" name="submit" value="submit">Pause</button>
+                </form>
+            {% endif %}           
+        </td>
+         <td>Cancel</td>
+         
+       {% endfor %}
+   </table>
+
+</h1>
+</html>

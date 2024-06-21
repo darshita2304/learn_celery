@@ -15,3 +15,8 @@ celery -A learn_celery.periodic_celery_app worker --loglevel=info
 ## to start 1st time beating...
 celery -A learn_celery.periodic_celery_app beat --loglevel=info
 
+
+## to see all sceduled/runnig or pending jobs list with wunning workers at http://localhost:5555/ ..
+celery -A celery_module.celery_app flower
+
+
