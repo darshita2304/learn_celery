@@ -1,0 +1,4 @@
+celery
+celery[tblib]
+flower
+rabbitmq

@@ -7,12 +7,18 @@ from time import sleep
 import pytz
 import sys
 import os
+import json
 from flask import Flask, request, render_template
-
 from celery_module.tasks import addition, reverse, task1, task2, task3, task4
+
+from celery_module.celery_app import app as celery_app
 
 
 app = Flask(__name__)
+
+# app = Celery('celery_app')
+# app.config_from_object('celery_module.celeryappconfig')
+
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 task_list = dict()
 
@@ -65,14 +71,13 @@ def create_celery_task(task_datetime, task_fn):
     return result
 
 
-# def waiting_results(task_id):
-#     result = app.AsyncResult(task_id)
-
-#     # Wait for the task to finish
-#     result.wait()
-#     # Get the result of the task
-#     print("Task finished")
-#     print(result.result)
+def update_json_records():
+    lst = []
+    for key, value in task_list.items():
+        lst.append(key)
+    # only task key need to be recorded...
+    with open('./celery_module/task_list.json', 'w') as fp:
+        json.dump(lst, fp)
 
 
 @ app.route("/")
@@ -91,9 +96,11 @@ def addtask():
     result = create_celery_task(task_datetime, task_fn)
 
     task_obj = {"task_name": task_name,
-                "task_datetime": task_time, "task_fn": task_fn, "is_pause": False, "result": result}
+                "task_datetime": task_time, "task_fn": task_fn, "status": "PENDING", "result": result}
     task_list[result.id] = task_obj
-    # waiting_results(result.id)
+
+    # update_json_records()
+
     return render_template("index.html", task_list=task_list)
 
 
@@ -107,11 +114,14 @@ def pause_task():
     task_id = request.form['task_id']
 
     result = task_list[task_id]['result']
-    task_list[task_id]['is_pause'] = True
+    task_list[task_id]['status'] = "PAUSED"
     result.revoke()
     print("task is requested to pause.... name = ")
     # print(task_id)
     print(task_list[task_id]['task_name'])
+
+    # update_json_records()
+
     return render_template("index.html", task_list=task_list)
 
 
@@ -126,14 +136,33 @@ def resume_task():
         task_datetime, task_list[old_task_id]['task_fn'])
 
     task_obj = {"task_name": task_list[old_task_id]['task_name'],
-                "task_datetime": old_task_datetime, "task_fn": task_list[old_task_id]['task_fn'], "is_pause": False, "result": new_result}
+                "task_datetime": old_task_datetime, "task_fn": task_list[old_task_id]['task_fn'], "status": "PENDING", "result": new_result}
 
     del task_list[old_task_id]
     task_list[new_result.id] = task_obj
 
+    # update_json_records()
     return render_template("index.html", task_list=task_list)
+
+
+@app.route('/get_status_tasks', methods=['GET'])
+def get_status_tasks():
+    for key, value in task_list.items():
+        print(key)
+        result = AsyncResult(key, app=celery_app)
+        print("--------")
+        print(result.ready())
+        # task_list[key]['status'] = result.status
+
+        if result.status == "SUCCESS":
+            task_list[key]['status'] = result.status
+
+    return render_template("index.html", task_list=task_list)
+    # return "checking result....
 
 
 if __name__ == '__main__':
     # Get the result of the task
     app.run(host='127.0.0.1', port=3000)
+
+    # check_for_result()

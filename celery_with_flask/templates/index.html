@@ -12,7 +12,7 @@
   <div id="wrapper">
     <div class="invitation">
       <header id="header">
-        <h1>New Taske</h1>
+        <h1>New Task</h1>
       </header>
       <main class="main">	
         <form id="inviteForm" action="/addtask" method="POST">
@@ -32,12 +32,13 @@
           <br/>
           <button type="submit" name="submit" value="submit">Add</button>
         </form>
-        <!-- 
-        <div class="showHide">
-          <label>Hide those who haven't responded</label>
-          <input type="checkbox">
+
+        <div class="">
+         <form id="pauseForm" action="/get_status_tasks" method="GET">
+            <button type="submit" name="submit" value="Get Status">Get Status of All Task</button>
+          </form>
         </div> 
-        -->
+
         <table cellspacing="0" border="1">
       <tr>
          <th>Task ID</th>
@@ -46,6 +47,7 @@
          <th>Task_fn</th>         
          <th>result</th>
          <th>isPause</th>
+         <th>Status</th>
       </tr>
       
         {% if task_list is defined %}
@@ -60,17 +62,24 @@
              <td>{{task['result']}}</td>
 
              <td>
-             {% if (task['is_pause']) %}
-                <form id="pauseForm" action="/resume_task" method="POST">
-                  <input type="hidden" id="task_id" name="task_id" value={{id}}>
-                  <button type="submit" name="submit" value="submit">Resume</button> </form>
-            {% else %}
-                <form id="pauseForm" action="/pause_task" method="POST">
-                  <input type="hidden" id="task_id" name="task_id" value={{id}}>
-                    <button type="submit" name="submit" value="submit">Pause</button>
-                </form>
-            {% endif %}           
-        </td>
+                {% if (task['status']) == "PENDING" %}
+
+                    <form id="pauseForm" action="/pause_task" method="POST">
+                      <input type="hidden" id="task_id" name="task_id" value={{id}}>
+                        <button type="submit" name="submit" value="submit">Pause</button>
+                    </form>
+
+                {% elif (task['status'] == "PAUSED") %}                  
+                    <form id="pauseForm" action="/resume_task" method="POST">
+                      <input type="hidden" id="task_id" name="task_id" value={{id}}>
+                      <button type="submit" name="submit" value="submit">Resume</button> </form>
+                {% endif %}           
+              </td>
+              <td>
+                {% if task['status'] is defined %}
+                  {{task['status']}}
+                {% endif %}
+              </td>
         </tr>
         {% endfor %}
           

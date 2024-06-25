@@ -2,6 +2,7 @@
 ## to run the celery server/worker
 
 celery -A learn_celery.celery_app worker -l info -P eventlet
+celery -A <module> worker -l info -P eventlet
 
 
 # to assign task to celery app...
